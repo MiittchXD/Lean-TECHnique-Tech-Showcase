@@ -1,5 +1,5 @@
 # Lean-TECHnique-Tech-Showcase
-This repository is for storing my tech showcase for my Lean TECHniques application.
+This repository is for storing Mitchell Bartoszyk's tech showcase for the Lean TECHniques Senior Embedded Software Enginer position.
 
 # PYTHON AND DEPENDENCY VERSIONS
 The following Python and library versions were used:
