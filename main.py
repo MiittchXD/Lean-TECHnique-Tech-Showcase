@@ -33,6 +33,89 @@ class Fan :
 
     def getFanState(self):
         return self.fanOn
+    
+# Create client class
+class Client:
+    def __init__(self, name, host, port, client_id, username, password):
+        self.name = name
+        self.host = host
+        self.port = port
+        self.client_id = client_id
+        self.username = username
+        self.password = password
+        self.client = ""
+
+    def connect(self):
+        def on_connect(client, userdata, flags, rc):
+            if rc == 0:
+                print(f"{self.name} Connected to MQTT Broker!")
+            else:
+                print(f"{self.name} Failed to connect, return code %d\n", rc)
+        
+        # Create mqtt client and connect, return client object
+        client = mqtt_client.Client(self.client_id)
+        client.tls_set()
+        client.username_pw_set(self.username, self.password)
+        client.on_connect = on_connect
+        client.connect(broker, port)
+        return client
+
+class Publisher(Client):
+    def __init__(self, name, host, port, client_id, username, password):
+        Client.__init__(self, name, host, port, client_id, username, password)
+        self.client = self.connect()
+
+    def publishMsg(self, client):
+        # Maintain message count for use in temperature list indexing
+        msg_count = 0
+
+        while msg_count < len(temperatures):
+            time.sleep(1)
+            # Ensure we loop around once the end of the list is reached
+            msg = f"{temperatures[msg_count % len(temperatures)]}"
+            result = client.publish(topic, msg)
+            # result: [0, 1]
+            status = result[0]
+            if status == 0:
+                print(f"[PUBLISHER]: Sent `{msg}` to topic `{topic}`")
+            else:
+                print(f"[PUBLISHER]: Failed to send message to topic {topic}")
+            msg_count += 1
+        
+        # Add extra second of sleep so the last temp published is captured by the Subscriber
+        time.sleep(1)
+
+    def start(self):
+        self.client.loop_start()
+        self.publishMsg(self.client)
+
+class Subscriber(Client):
+    def __init__(self, name, host, port, client_id, username, password):
+        Client.__init__(self, name, host, port, client_id, username, password)
+        self.client = self.connect()
+
+    def subscribe(self, client):
+    
+        # Topic message handler
+        def on_message(client, userdata, msg):
+
+            temp = msg.payload.decode("utf-8")
+
+            # Set fan on if temp is greater than 70.0 Degrees, otherwise set to false
+            if (float(temp) >= 70.0):
+                testFan.fanOn = True
+            else:
+                testFan.fanOn = False
+            
+            print(f"[SUBSCRIBER]: Current Temperature is `{msg.payload.decode()}' degrees - Fan: {testFan.getFanState()}")
+        
+        # Set topic and set message handler
+        self.client.subscribe(topic)
+        self.client.on_message = on_message
+
+    def start(self):
+        self.subscribe(self.client)
+        self.client.loop_start()
 
 class publisherThread(threading.Thread):
     def __init__(self, thread_name, thread_ID):
@@ -45,9 +128,7 @@ class publisherThread(threading.Thread):
         print("Starting publisherThread...")\
 
         # Connect publisher client and start publish loop
-        publiherClient = connect_mqtt_publisher()
-        publiherClient.loop_start()
-        publish(publiherClient)
+        publisher.start()
         
 class subscriberThread(threading.Thread):
     def __init__(self, thread_name, thread_ID):
@@ -60,93 +141,28 @@ class subscriberThread(threading.Thread):
         print("Starting subscriberThread...")
 
         # Connect subscriber client and start listener loop
-        subscriberClient = connect_mqtt_subscriber()
-        subscribe(subscriberClient)
-        subscriberClient.loop_start()
-
-# Function to connect the publisher client to the host
-def connect_mqtt_publisher():
-    def on_connect(client, userdata, flags, rc):
-        if rc == 0:
-            print("Publisher Connected to MQTT Broker!")
-        else:
-            print("Publisher Failed to connect, return code %d\n", rc)
-
-    client = mqtt_client.Client(client_id_publisher)
-    client.tls_set()
-    client.username_pw_set(username, password)
-    client.on_connect = on_connect
-    client.connect(broker, port)
-    return client
-
-# Function to connect the subscriber client to the host
-def connect_mqtt_subscriber() -> mqtt_client:
-    def on_connect(client, userdata, flags, rc):
-        if rc == 0:
-            print("Subscriber Connected to MQTT Broker!")
-        else:
-            print("Subscriber Failed to connect, return code %d\n", rc)
-
-    client = mqtt_client.Client(client_id_subscriber)
-    client.tls_set()
-    client.username_pw_set(username, password)
-    client.on_connect = on_connect
-    client.connect(broker, port)
-    return client
-
-# Function used by the publisher client to publish a message to the host
-def publish(client):
+        subscriber.start()
     
-    # Maintain message count for use in temperature list indexing
-    msg_count = 0
-
-    while msg_count < len(temperatures):
-        time.sleep(1)
-        # Ensure we loop around once the end of the list is reached
-        msg = f"{temperatures[msg_count % len(temperatures)]}"
-        result = client.publish(topic, msg)
-        # result: [0, 1]
-        status = result[0]
-        if status == 0:
-            print(f"[PUBLISHER]: Sent `{msg}` to topic `{topic}`")
-        else:
-            print(f"[PUBLISHER]: Failed to send message to topic {topic}")
-        msg_count += 1
-    
-    # Add extra second of sleep so the last temp published is captured by the Subscriber
-    time.sleep(1)
-
-# Function to subscribe the subscrbe client to a topic and set a handler function for when the topic is received
-def subscribe(client: mqtt_client):
-    
-    # Topic message handler
-    def on_message(client, userdata, msg):
-
-        temp = msg.payload.decode("utf-8")
-
-        # Set fan on if temp is greater than 70.0 Degrees, otherwise set to false
-        if (float(temp) >= 70.0):
-           testFan.fanOn = True
-        else:
-            testFan.fanOn = False
-        
-        print(f"[SUBSCRIBER]: Current Temperature is `{msg.payload.decode()}' degrees - Fan: {testFan.getFanState()}")
-    
-    client.subscribe(topic)
-    client.on_message = on_message
-    
-
 
 if __name__ == '__main__':
-    # Create Publisher and Subscriber threads
-    publisher = publisherThread("publisherThread", 0)
-    subscriber = subscriberThread("subscriberThread", 1)
     
-    # Create Fan object with default status of off (fanOn = False)
+    # Create Publisher and Subscriber objects
+    publisher = Publisher("Publisher", broker, port, client_id_publisher, username, password)
+    subscriber = Subscriber("Subscriber", broker, port, client_id_subscriber, username, password)
+
+    # Create Publisher and Subscriber threads
+    testPublisherThread = publisherThread("publisherThread", 0)
+    testPubscriberThread = subscriberThread("subscriberThread", 1)
+    
+    # Create a basic Fan object with default status of off (fanOn = False)
     testFan = Fan(False)
 
-    # Start both threads 
-    publisher.start()
-    subscriber.start()
+    # Run both threads 
+    testPublisherThread.start()
+    testPubscriberThread.start()
+
+    
+   
+    
 
 
