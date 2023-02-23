@@ -2,8 +2,10 @@
 This repository is for storing Mitchell Bartoszyk's tech showcase for the Lean TECHniques Senior Embedded Software Enginer position.
 
 # REFERENCES
-https://docs.emqx.com/en/cloud/latest/
-https://pypi.org/project/paho-mqtt/
+
+- https://docs.emqx.com/en/cloud/latest/
+
+- https://pypi.org/project/paho-mqtt/
 
 # SOFTWARE VERSIONS
 The following Python and library versions were used:
