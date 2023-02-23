@@ -22,5 +22,5 @@ The following Python and library versions were used:
 # RUNNING THE PROGRAM
 1. Navigate to the directory created in step 3 above.
 2. Open a terminal in this directory. 
-3. If you are windows Enter the following and press ENTER to run the program: "python3 main.py"
+3. Enter the following in the terminal and press the ENTER key to run the program: "python3 main.py"
 4. View output in console. 
