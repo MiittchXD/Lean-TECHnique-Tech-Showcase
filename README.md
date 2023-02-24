@@ -24,16 +24,18 @@ The following Python, PIP, and library versions were used:
 # RUNNING THE PROGRAM
 1. Navigate to the directory created in step 3 of the SETUP section.
 2. Open a terminal in this directory.
-3. For Windows, enter the following in the terminal and press the ENTER key to run the program: "py main.py"
-4. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run the program: "python3 main.py"
-5. View output in terminal. 
+3. Navigate into the "src" folder.
+4. For Windows, enter the following in the terminal and press the ENTER key to run the program: "py main.py"
+5. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run the program: "python3 main.py"
+6. View output in terminal. 
 
 # RUNNING THE TESTS
 1. Navigate to the directory created in step 3 of the SETUP section.
 2. Open a terminal in this directory.
-3. For Windows, enter the following in the terminal and press the ENTER key to run each test file: "py {FILE_NAME}.py", example: "py test_client.py"
-4. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run each test file: "python3 {FILE_NAME}.py", example: "python3 test_client.py"
-5. View test results in terminal. 
+3. Navigate into the "src" folder.
+4. For Windows, enter the following in the terminal and press the ENTER key to run each test file: "py {FILE_NAME}.py", example: "py test_client.py"
+5. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run each test file: "python3 {FILE_NAME}.py", example: "python3 test_client.py"
+6. View test results in terminal. 
 
 
 
