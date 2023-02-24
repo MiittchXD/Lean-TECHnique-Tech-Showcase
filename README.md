@@ -7,8 +7,10 @@ This repository is for storing Mitchell Bartoszyk's tech showcase for the Lean T
 
 - https://pypi.org/project/paho-mqtt/
 
+- https://docs.python.org/3/library/unittest.html
+
 # SOFTWARE VERSIONS
-The following Python and library versions were used:
+The following Python, PIP, and library versions were used:
 - Python: 3.10.10
 - Pip: 23.0.1
 - Numpy: 1.24.2
@@ -20,7 +22,18 @@ The following Python and library versions were used:
 3. Clone this repository into your desired directory using git bash or manually via github (.zip file). Be sure to extract the zip file if the code is manually downloaded from the github website.
 
 # RUNNING THE PROGRAM
-1. Navigate to the directory created in step 3 above.
-2. Open a terminal in this directory. 
-3. Enter the following in the terminal and press the ENTER key to run the program: "python3 main.py"
-4. View output in console. 
+1. Navigate to the directory created in step 3 of the SETUP section.
+2. Open a terminal in this directory.
+3. For Windows, enter the following in the terminal and press the ENTER key to run the program: "py main.py"
+4. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run the program: "python3 main.py"
+5. View output in terminal. 
+
+# RUNNING THE TESTS
+1. Navigate to the directory created in step 3 of the SETUP section.
+2. Open a terminal in this directory.
+3. For Windows, enter the following in the terminal and press the ENTER key to run each test file: "py {FILE_NAME}.py", example: "py test_client.py"
+4. For MacOS and Linux, enter the following in the terminal and press the ENTER key to run each test file: "python3 {FILE_NAME}.py", example: "python3 test_client.py"
+5. View test results in terminal. 
+
+
+
